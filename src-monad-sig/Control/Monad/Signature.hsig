@@ -1,0 +1,7 @@
+signature Control.Monad.Signature where
+
+data M a
+
+instance Functor M
+instance Applicative M
+instance Monad M

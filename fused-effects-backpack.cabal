@@ -1,0 +1,56 @@
+cabal-version: 3.0
+name:          fused-effects-backpack
+version:       1.0.0
+build-type:    Simple
+
+library business-logic
+  hs-source-dirs:   lib
+  signatures:       BusinessLogic.Monad
+  exposed-modules:  BusinessLogic
+  build-depends:
+    , base
+    , fused-effects
+    , monad-sig
+
+  default-language: Haskell2010
+  mixins:
+    monad-sig requires (Control.Monad.Signature as BusinessLogic.Monad)
+
+library monad-sig
+  hs-source-dirs:   src-monad-sig
+  signatures:       Control.Monad.Signature
+  default-language: Haskell2010
+  build-depends:    base
+
+library fused-effects-empty-maybe
+  hs-source-dirs:   src-fused-effects-backpack
+  default-language: Haskell2010
+  build-depends:
+    , base
+    , fused-effects
+    , monad-sig
+
+  exposed-modules:  Control.Carrier.Backpack.Empty.Maybe
+  mixins:
+    monad-sig () requires (Control.Monad.Signature as Control.Carrier.Backpack.Empty.Maybe.Base)
+
+library fused-effects-lift-io
+  hs-source-dirs:   src-fused-effects-backpack
+  default-language: Haskell2010
+  build-depends:    base
+  exposed-modules:  Control.Carrier.Backpack.Lift.IO
+
+executable test
+  main-is:          Main.hs
+  hs-source-dirs:   exe
+  build-depends:
+    , base
+    , business-logic
+    , fused-effects-empty-maybe
+    , fused-effects-lift-io
+    , transformers
+
+  default-language: Haskell2010
+  mixins:
+    fused-effects-empty-maybe (Control.Carrier.Backpack.Empty.Maybe as BusinessLogic.Monad) requires (Control.Carrier.Backpack.Empty.Maybe.Base as BusinessLogic.Monad.Base),
+    fused-effects-lift-io (Control.Carrier.Backpack.Lift.IO as BusinessLogic.Monad.Base)
